@@ -52,7 +52,7 @@ struct BstNode* Delete(struct BstNode *root, int data) {
 		// Case 1:  No child
 		if(root->left == NULL && root->right == NULL) { 
 			root = NULL;
-			delete root;h
+			delete root;
 		}
 		//Case 2: One child 
 		else if(root->left == NULL) {
