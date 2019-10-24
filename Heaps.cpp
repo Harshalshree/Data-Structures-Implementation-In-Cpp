@@ -1,135 +1,175 @@
-#include <bits/stdc++.h> 
-using namespace std; 
-  
-void insert(int* arr, int n, int &last){
-		if(last == 100){
-			cout << "Heap Full" << endl;
-			return;
-		}
-		else{
-			arr[++last] = n;
-			int i = last;
-			while(i>1){
-				if(arr[i] > arr[i/2]){
-					swap(arr[i],arr[i/2]);
-					i = i/2;
-				}
-				else{
-					return;
-				}
-			}
-		}
+#include<iostream>
+using namespace std;
+
+// A heap can be implemented using an array
+// The child of parent node ,which is at index i in array
+// will always be at index 2i+1 and 2i+2
+class heap {
+	int arr[50];
+	int count;
+	public:
+		heap();
+		bool isFull();
+		bool isEmpty();
+		void insert(int);
+		int getSize(); // Get the current size of heap
+		void heapify(int);
+		void build_max_heap(); // Build a max heap
+		void display_heap(); // Print the elements in the heap
+		int delete_first_element(); // Remove the first element and return it
+		int get_left_child(int); // Returns the left child of a parent
+		int get_right_child(int); // Returns the right child of a parent
+		int get_parent(int); // Returns the value of parent index
+		int get_max(); // Returns the maximum element in the heap
+		void replace(int, int); // Replaces the key value at an index
+		void siftUp(int); // To re-convert the changed heap into max heap
+};
+// Here we assume that the heap can have a maximum size of 50
+heap::heap() {
+	count = 0;
 }
 
-void deleteElement(int* arr, int& last){
-	arr[1] = arr[last];
-	last --;
-	bool check = true;
-	int i = 1;
-	while(check == true){
-		int maxno;
-		int tempdig;
-		if(arr[2*i] > arr[2*i + 1]){
-			tempdig = 2*i;
-		}
-		else{
-			tempdig = 2*i + 1;
-		}
+bool heap::isFull() {
+	return count == 50;
+}
 
-		if(arr[i] < arr[tempdig]){
-			swap(arr[i],arr[tempdig]);
-			i = tempdig;
-			check = true;
-		}
-		else{
-			check = false;
-		}
+bool heap::isEmpty() {
+	return count == 0;
+}
+
+void heap::insert(int val) {
+	if(!isFull()) {
+		arr[count++] = val;
+		siftUp(count-1);
 	}
 }
 
-void printArray(int *arr, int last){
-	for(int i = 1; i <=last;i++){
-		cout << arr[i] << " | ";
+int heap::getSize() {
+	return count+1;
+}
+
+// This program demonstrates the logic to build max_heaps
+// To build min_heaps simply change the following lines
+// Line 54: arr[maxindex] > arr[leftchild]
+// Line 62: arr[maxindex] > arr[rightchild]
+void heap::heapify(int index) {
+	int parent = index;
+	int leftchild = 2*index+1;
+	int rightchild = 2*index+2;
+	int maxindex = parent;
+	if(leftchild < count) {
+		if(arr[maxindex] < arr[leftchild]) {
+			maxindex = leftchild;
+		}
+	}
+	if(rightchild < count) {
+		if(arr[maxindex] < arr[rightchild]) {
+			maxindex = rightchild;
+		}
+	}
+	if(maxindex != index) {
+		int temp = arr[maxindex];
+		arr[maxindex] = arr[index];
+		arr[index] = temp;
+		heapify(maxindex);
 	}
 }
 
-void heapify(int arr[], int n, int i) 
-{ 
-    int largest = i;
-    int l = 2*i + 1; 
-    int r = 2*i + 2; 
-  
-    if (l < n && arr[l] > arr[largest]) 
-        largest = l; 
-  
-    if (r < n && arr[r] > arr[largest]) 
-        largest = r; 
-  
-    if (largest != i) 
-    { 
-        swap(arr[i], arr[largest]); 
-  
-        heapify(arr, n, largest); 
-    } 
-} 
-  
-void heapSort(int arr[], int n) 
-{ 
-    for (int i = n / 2 - 1; i >= 0; i--) 
-        heapify(arr, n, i); 
-  
-    for (int i=n-1; i>=0; i--) 
-    {  
-        swap(arr[0], arr[i]); 
-        heapify(arr, i, 0); 
-    } 
-} 
-
-void printArrayHeapSort(int *arr, int size){
-	for(int i=0; i<size; i++){
-		cout << arr[i] << endl;
+void heap::build_max_heap() {
+	for(int i = count/2; i >= 0; i--) {
+		heapify(i);
 	}
-}  
-  
-int main() 
-{ 
-	int* arr = new int[101];
-	int c = 1;
-	int elem;
-	int last = 0;
-	cout << "HEAPS:" << endl;
-	while(c!=0){
-		cout << "Enter your choice:" << endl;
-		cout << "1.INSERT\n2.DELETE\n3.PRINT THE HEAP AS IN ARRAY\n4.HEAP SORT\n0.QUIT PROGRAM" << endl;
-		cin >> c;
-		switch(c){
-			case 1:
-			cout << "Enter an element" << endl;
-			cin >> elem;
-			insert(arr,elem,last);
-			break;
+}
 
-			case 2:
-			deleteElement(arr,last);
-			break;
-
-			case 3:
-			printArray(arr,last);
-			break;
-			case 4:
-			int size;
-			cout << "Enter the size of array" << endl;
-			cin >> size;
-			int harr[size];
-			for(int x = 0; x < size; x++){
-				cout << "Enter Elements" << endl;
-				cin >> harr[x];
-			}
-			heapSort(harr,size);
-			cout << "The sorted array" << endl;
-			printArrayHeapSort(harr,size);
-			break;
-		}
+void heap::display_heap() {
+	for(int i = 0; i < count; i++) {
+		cout << arr[i] << " ";
 	}
+	cout << "\n";
+}
 
-} 
+// This also returns the largest element in the heap
+int heap::delete_first_element() {
+	if(isEmpty()) {
+		return -1;
+	} else {
+		int temp = arr[0];
+		arr[0] = arr[count-1];
+		arr[count-1] = temp;
+		heapify(0);
+		count--;
+		return arr[count];
+	}
+}
+
+int heap::get_left_child(int i) {
+	if(2*i+1 < count) {
+		return arr[2*i+1];
+	} else {
+		return -1;
+	}
+}
+
+int heap::get_right_child(int i) {
+	if(2*i+2 < count) {
+		return arr[2*i+2];
+	} else {
+		return -1;
+	}
+}
+
+int heap::get_parent(int i) {
+	if(i < count) {
+		return arr[i];
+	} else {
+		return -1;
+	}
+}
+
+int heap::get_max() {
+	if(isEmpty()) {
+		return -1;
+	} else {
+		return arr[0];
+	}
+}
+
+void heap::replace(int value, int index) {
+	if(index < count) {
+		arr[index] = value;
+		siftUp(index);
+	}
+}
+
+void heap::siftUp(int index) {
+	while(index != 0) {
+		index = (index-1)/2;	// To get the parent of a child
+		heapify(index);
+	}
+}
+
+// Driver method
+int main() {
+	heap hp;
+	hp.insert(4);
+	hp.insert(2);
+	hp.insert(6);
+	hp.insert(7);
+	hp.insert(4);
+	hp.insert(9);
+	hp.insert(1);
+	hp.insert(5);
+	hp.insert(19);
+	hp.insert(5);
+	hp.insert(7);
+	hp.build_max_heap();
+	hp.display_heap();
+	cout << hp.delete_first_element() << "\n";
+	hp.display_heap();
+	cout << hp.get_max() << "\n";
+	cout << "Parent" << hp.get_parent(2) << "\n";
+	cout << "Left" << hp.get_left_child(2) << "\n";
+	cout << "Right" << hp.get_right_child(2) << "\n";
+	hp.replace(20, 9);
+	hp.display_heap();
+}
